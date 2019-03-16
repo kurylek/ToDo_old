@@ -7,7 +7,7 @@ public class Main {
     static String[] taskName= new String[100];
     static String[] taskDescription= new String[100];
     static boolean[] taskDone= new boolean[100];
-    static String currentTaskList; //zmienna przechowująca nazwę listy zadan
+    static String currentTaskList= "default.txt"; //zmienna przechowująca nazwę listy zadan
 
     public static void menu(){
         System.out.println("\n");
@@ -102,10 +102,51 @@ public class Main {
         }while(option!=0);
     }
 
+    public static void loadTasks() throws  IOException{
+
+        File taskFile = new File(currentTaskList);
+        boolean taskFileExists = taskFile.exists();
+
+        if(taskFileExists){
+            FileReader fileReader= new FileReader(currentTaskList);
+            BufferedReader reader= new BufferedReader(fileReader);
+
+            tasksCount= Integer.parseInt(reader.readLine());
+            for(int i=0;i<tasksCount;i++){
+                taskName[i]= reader.readLine();
+                taskDescription[i]= reader.readLine();
+                taskDone[i]= Boolean.parseBoolean(reader.readLine());
+            }
+
+            reader.close();
+
+            System.out.println("Wczytano "+tasksCount+" zadan.");
+        }else{
+            System.out.println("Nie wczytano zadan.");
+        }
+    }
+
+    public static void saveTasks() throws IOException{
+        PrintWriter printWriter= new PrintWriter(currentTaskList);
+
+        printWriter.println(tasksCount);
+        for(int i=0;i<tasksCount;i++){
+            printWriter.println(taskName[i]);
+            printWriter.println(taskDescription[i]);
+            printWriter.println(taskDone[i]);
+        }
+
+        printWriter.close();
+
+        System.out.println("Zapisano "+tasksCount+" zadan.");
+    }
+
     public static void main(String[] args) throws IOException {
         Scanner scanner= new Scanner(System.in);
         int option;
         boolean taskExist;
+
+        loadTasks();
 
         do{
             menu();
@@ -121,11 +162,11 @@ public class Main {
                 case 2:
                     boolean hasCapacityForNewTask= tasksCount<taskName.length;
                     if(hasCapacityForNewTask){
-                        System.out.println("Podaj nazwe nowego zadania ");
+                        System.out.println("Podaj nazwe nowego zadania:");
                         String newTaskName= scanner.next();
                         newTaskName+= scanner.nextLine();
 
-                        System.out.println("Podaj opis zadania: ");
+                        System.out.println("Podaj opis zadania:");
                         String newTaskDescription= scanner.nextLine();
 
                         addTask(newTaskName, newTaskDescription);
@@ -158,7 +199,7 @@ public class Main {
                     }
                     break;
                 case 5:
-                    System.out.println("//zapis//");
+                    saveTasks();
                     break;
                 case 6:
                     System.out.println("//opcje//");
